@@ -195,8 +195,12 @@ class NetworkClient:
             self.lock.acquire()
 
         try:
-            self.sock.send(struct.pack('ccccIII', b'O', b'R', b'G', b'B', device_id, packet_type, packet_size), NOSIGNAL)
-        except Exception as e:
+            sent = self.sock.send(struct.pack('ccccIII', b'O', b'R', b'G', b'B', device_id, packet_type, packet_size), NOSIGNAL)
+            if sent != packet_size:
+                self.stop_connection()
+                self.lock.release()
+                raise utils.OpenRGBDisconnected()
+        except utils.CONNECTION_ERRORS as e:
             self.stop_connection()
             self.lock.release()
             raise utils.OpenRGBDisconnected() from e
@@ -210,7 +214,10 @@ class NetworkClient:
         if self.sock is None:
             raise utils.OpenRGBDisconnected()
         try:
-            self.sock.send(data, NOSIGNAL)
+            sent = self.sock.send(data, NOSIGNAL)
+            if (sent != len(data)):
+                self.stop_connection()
+                raise utils.OpenRGBDisconnected()
         except utils.CONNECTION_ERRORS as e:
             self.stop_connection()
             raise utils.OpenRGBDisconnected() from e
