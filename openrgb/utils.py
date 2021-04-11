@@ -7,7 +7,7 @@ import colorsys
 
 HEADER_SIZE = 16
 
-CONNECTION_ERRORS = (ConnectionResetError, BrokenPipeError, TimeoutError)
+CONNECTION_ERRORS = (Exception)
 
 
 class ModeFlags(IntFlag):
