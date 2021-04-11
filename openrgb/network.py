@@ -198,6 +198,7 @@ class NetworkClient:
             self.sock.send(struct.pack('ccccIII', b'O', b'R', b'G', b'B', device_id, packet_type, packet_size), NOSIGNAL)
         except utils.CONNECTION_ERRORS as e:
             self.stop_connection()
+            self.lock.release()
             raise utils.OpenRGBDisconnected() from e
 
     def send_data(self, data: bytes, release_lock: bool = True):
