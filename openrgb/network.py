@@ -78,6 +78,11 @@ class NetworkClient:
         '''
         Closes the active socket
         '''
+        try:
+            self.lock.release()
+        except Exception:
+            pass
+        
         if self.sock is not None:
             self.sock.close()
             self.sock = None
@@ -199,11 +204,9 @@ class NetworkClient:
             sent = self.sock.send(data, NOSIGNAL)
             if sent != len(data):
                 self.stop_connection()
-                self.lock.release()
                 raise utils.OpenRGBDisconnected()
         except utils.CONNECTION_ERRORS as e:
             self.stop_connection()
-            self.lock.release()
             raise utils.OpenRGBDisconnected() from e
 
     def send_data(self, data: bytes, release_lock: bool = True):
