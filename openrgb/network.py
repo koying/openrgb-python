@@ -195,8 +195,9 @@ class NetworkClient:
             self.lock.acquire()
 
         try:
-            sent = self.sock.send(struct.pack('ccccIII', b'O', b'R', b'G', b'B', device_id, packet_type, packet_size), NOSIGNAL)
-            if sent != packet_size:
+            data = struct.pack('ccccIII', b'O', b'R', b'G', b'B', device_id, packet_type, packet_size)
+            sent = self.sock.send(data, NOSIGNAL)
+            if sent != len(data):
                 self.stop_connection()
                 self.lock.release()
                 raise utils.OpenRGBDisconnected()
